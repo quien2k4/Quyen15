@@ -59,6 +59,25 @@
                             <span asp-validation-for="AppointmentTime" class="text-danger"></span>
                         </div>
 
+                        <hr />
+
+                        <h5>Payment Information</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Examination Fee</label>
+                            <input value="100000 VND" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method</label>
+                            <select name="paymentMethod" class="form-select">
+                                <option value="Online">Online</option>
+                                <option value="Banking">Banking</option>
+                                <option value="Momo">Momo</option>
+                                <option value="Cash">Cash</option>
+                            </select>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">
                             Confirm Register
                         </button>

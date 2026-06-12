@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Quyen15.Models;
+using Quyen15.Services;
+using System.Text;
 
 namespace Quyen15.Controllers
 {
     public class AppointmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
 
-        public AppointmentsController(ApplicationDbContext context)
+        public AppointmentsController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -62,7 +66,8 @@ namespace Quyen15.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Appointment appointment)
+        [HttpPost]
+        public async Task<IActionResult> Create(Appointment appointment, string paymentMethod)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("Role");
@@ -133,7 +138,82 @@ namespace Quyen15.Controllers
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Appointment registered successfully.";
+            var payment = new Payment
+            {
+                IdAppointment = appointment.IdAppointment,
+                Amount = 100000,
+                PaymentMethod = string.IsNullOrWhiteSpace(paymentMethod) ? "Online" : paymentMethod,
+                PaymentStatus = "Paid",
+                PaymentDate = DateTime.Now
+            };
+
+            _context.Payments.Add(payment);
+            await _context.SaveChangesAsync();
+
+            try
+            {
+                var user = await _context.UserAccounts.FindAsync(userId.Value);
+
+                if (user != null)
+                {
+                    string subject = "Appointment Confirmation - Quyen15 Medical";
+
+                    string body = $@"
+            <h2>Appointment Confirmation</h2>
+
+            <p>Hello <strong>{patient.Name}</strong>,</p>
+
+            <p>Your medical appointment has been registered successfully.</p>
+
+            <table border='1' cellpadding='8' cellspacing='0' style='border-collapse: collapse;'>
+                <tr>
+                    <td><strong>Patient</strong></td>
+                    <td>{patient.Name}</td>
+                </tr>
+                <tr>
+                    <td><strong>Phone</strong></td>
+                    <td>{patient.Phone}</td>
+                </tr>
+                <tr>
+                    <td><strong>Doctor</strong></td>
+                    <td>{doctor.Name}</td>
+                </tr>
+                <tr>
+                    <td><strong>Specialization</strong></td>
+                    <td>{doctor.Specialization}</td>
+                </tr>
+                <tr>
+                    <td><strong>Appointment Date</strong></td>
+                    <td>{appointment.AppointmentDate:dd/MM/yyyy}</td>
+                </tr>
+                <tr>
+                    <td><strong>Appointment Time</strong></td>
+                    <td>{appointment.AppointmentTime:hh\\:mm}</td>
+                </tr>
+                <tr>
+                    <td><strong>Status</strong></td>
+                    <td>{appointment.Status}</td>
+                </tr>
+                <tr>
+                    <td><strong>Payment</strong></td>
+                    <td>{payment.Amount:N0} VND - {payment.PaymentStatus}</td>
+                </tr>
+            </table>
+
+            <p>Thank you for using Quyen15 Medical Examination Registration.</p>
+        ";
+
+                    await _emailService.SendEmailAsync(user.Email, subject, body);
+
+                    TempData["Success"] = "Appointment registered, payment completed, and confirmation email sent successfully.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Success"] = "Appointment registered and payment completed successfully, but confirmation email could not be sent.";
+                TempData["EmailError"] = ex.Message;
+            }
+
             return RedirectToAction("MyAppointments");
         }
 
@@ -155,11 +235,12 @@ namespace Quyen15.Controllers
             }
 
             var appointments = await _context.Appointments
-                .Include(a => a.Doctor)
-                .Include(a => a.MedicalRecord)
-                .Where(a => a.IdPatient == patient.IdPatient)
-                .OrderByDescending(a => a.AppointmentDate)
-                .ToListAsync();
+    .Include(a => a.Doctor)
+    .Include(a => a.MedicalRecord)
+    .Include(a => a.Payment)
+    .Where(a => a.IdPatient == patient.IdPatient)
+    .OrderByDescending(a => a.AppointmentDate)
+    .ToListAsync();
 
             return View(appointments);
         }

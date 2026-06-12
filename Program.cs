@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Quyen15.Models;
+using Quyen15.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSession();
+builder.Services.AddTransient<EmailService>();
 
 var app = builder.Build();
 

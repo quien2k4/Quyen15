@@ -21,6 +21,13 @@
         </div>
     }
 
+
+    @if (TempData["EmailError"] != null)
+    {
+        <div class="alert alert-warning">
+            Email error: @TempData["EmailError"]
+        </div>
+    }
     <table class="table table-bordered table-hover">
         <thead class="table-dark">
             <tr>
@@ -29,6 +36,7 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Status</th>
+                <th>Payment</th>
                 <th>Medical Record</th>
                 <th>Action</th>
             </tr>
@@ -61,6 +69,27 @@
                         else
                         {
                             <span class="badge bg-secondary">@item.Status</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.Payment != null)
+                        {
+                            <div>
+                                <strong>@item.Payment.Amount.ToString("N0") VND</strong>
+                            </div>
+
+                            <span class="badge bg-success">
+                                @item.Payment.PaymentStatus
+                            </span>
+
+                            <div class="text-muted small">
+                                @item.Payment.PaymentMethod
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Unpaid</span>
                         }
                     </td>
 
