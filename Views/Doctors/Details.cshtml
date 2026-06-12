@@ -63,6 +63,59 @@
 
     <h4 class="mt-4">Comments and Reviews</h4>
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success mt-3">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-3">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-success text-white">
+            Add Your Review
+        </div>
+
+        <div class="card-body">
+            <form asp-controller="Doctors" asp-action="CreateReview" method="post">
+                <input type="hidden" name="idDoctor" value="@Model.IdDoctor" />
+
+                <div class="mb-3">
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select">
+                        <option value="5">5 stars - Excellent</option>
+                        <option value="4">4 stars - Good</option>
+                        <option value="3">3 stars - Normal</option>
+                        <option value="2">2 stars - Not good</option>
+                        <option value="1">1 star - Bad</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Comment</label>
+                    <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment..."></textarea>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input name="isLike" value="true" class="form-check-input" type="checkbox" id="isLike" />
+                    <label class="form-check-label" for="isLike">
+                        Like this doctor
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+    </div>
+
     @if (Model.DoctorReviews != null && Model.DoctorReviews.Any())
     {
         foreach (var review in Model.DoctorReviews)
