@@ -14,12 +14,14 @@ namespace Quyen15.Services
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            var host = _configuration["Smtp:Host"];
-            var port = int.Parse(_configuration["Smtp:Port"] ?? "587");
-            var userName = _configuration["Smtp:UserName"];
-            var password = _configuration["Smtp:Password"];
-            var fromEmail = _configuration["Smtp:FromEmail"];
-            var fromName = _configuration["Smtp:FromName"];
+            var host = _configuration["Smtp:Host"]?.Trim();
+            var portText = _configuration["Smtp:Port"]?.Trim() ?? "587";
+            var userName = _configuration["Smtp:UserName"]?.Trim();
+            var password = _configuration["Smtp:Password"]?.Replace(" ", "").Trim();
+            var fromEmail = _configuration["Smtp:FromEmail"]?.Trim();
+            var fromName = _configuration["Smtp:FromName"]?.Trim();
+
+            int port = int.Parse(portText);
 
             if (string.IsNullOrWhiteSpace(host) ||
                 string.IsNullOrWhiteSpace(userName) ||
@@ -37,7 +39,7 @@ namespace Quyen15.Services
                 IsBodyHtml = true
             };
 
-            message.To.Add(toEmail);
+            message.To.Add(toEmail.Trim());
 
             using var client = new SmtpClient(host, port)
             {

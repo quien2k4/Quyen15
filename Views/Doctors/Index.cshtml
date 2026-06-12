@@ -1,73 +1,96 @@
 ﻿@model IEnumerable<Quyen15.Models.Doctor>
 
 @{
-    ViewData["Title"] = "Home";
-    string sectionTitle = ViewBag.SectionTitle as string ?? "Popular Doctors";
+    ViewData["Title"] = "Doctors List";
+
+    int currentPage = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+    int pageSize = ViewBag.PageSize;
+    string search = ViewBag.Search as string ?? "";
 }
 
-<div class="p-5 mb-4 rounded-3 shadow-sm bg-primary text-white">
-    <div class="container-fluid py-4">
-        <h1 class="display-5 fw-bold">Medical Examination Registration</h1>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Doctors List</h2>
 
-        <p class="col-md-8 fs-5">
-            Find trusted doctors, register for medical appointments, view your medical history,
-            and manage examination records easily.
-        </p>
+    <form asp-action="Index" method="get" class="row mb-4">
+        <div class="col-md-8">
+            <input type="text"
+                   name="search"
+                   value="@search"
+                   class="form-control"
+                   placeholder="Search by doctor name, specialization, email..." />
+        </div>
 
-        <a asp-controller="Doctors" asp-action="Index" class="btn btn-light btn-lg">
-            View Doctors
-        </a>
-    </div>
-</div>
+        <div class="col-md-2">
+            <select name="pageSize" class="form-select">
+                <option value="3" selected="@(pageSize == 3)">3</option>
+                <option value="6" selected="@(pageSize == 6)">6</option>
+                <option value="9" selected="@(pageSize == 9)">9</option>
+            </select>
+        </div>
 
-<div class="container">
-    <h3 class="mb-4">@sectionTitle</h3>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+                Search
+            </button>
+        </div>
+    </form>
 
     <div class="row">
-        @foreach (var doctor in Model)
+        @foreach (var item in Model)
         {
-            double avgRating = doctor.DoctorReviews != null && doctor.DoctorReviews.Any()
-                ? doctor.DoctorReviews.Average(r => r.Rating)
+            double avgRating = item.DoctorReviews != null && item.DoctorReviews.Any()
+                ? item.DoctorReviews.Average(r => r.Rating)
                 : 0;
 
-            int likeCount = doctor.DoctorReviews != null
-                ? doctor.DoctorReviews.Count(r => r.IsLike)
+            int likeCount = item.DoctorReviews != null
+                ? item.DoctorReviews.Count(r => r.IsLike)
                 : 0;
 
-            <div class="col-md-3 mb-4">
+            <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
-                    <img src="@(string.IsNullOrEmpty(doctor.Image) ? "https://placehold.co/300x220?text=Doctor" : doctor.Image)"
-                         class="card-img-top"
-                         style="height:220px; object-fit:cover;"
-                         onerror="this.src='https://placehold.co/300x220?text=Doctor';" />
+                    <div class="card-header fw-bold">
+                        @item.Name
+                    </div>
 
                     <div class="card-body">
-                        <h5 class="card-title">@doctor.Name</h5>
-
-                        <p class="card-text mb-1">
-                            <strong>Specialization:</strong> @doctor.Specialization
+                        <p>
+                            <strong>Specialization:</strong> @item.Specialization
                         </p>
 
-                        <p class="card-text mb-1">
+                        <p>
+                            <strong>Phone:</strong> @item.Phone
+                        </p>
+
+                        <p>
+                            <strong>Email:</strong> @item.Email
+                        </p>
+
+                        <p>
                             <strong>Rating:</strong> @avgRating.ToString("0.0") / 5
                         </p>
 
-                        <p class="card-text">
+                        <p>
                             <strong>Likes:</strong> @likeCount
                         </p>
+
+                        <img src="@(string.IsNullOrEmpty(item.Image) ? "https://placehold.co/300x220?text=Doctor" : item.Image)"
+                             class="img-fluid rounded"
+                             style="height:220px; width:100%; object-fit:cover;"
+                             onerror="this.src='https://placehold.co/300x220?text=Doctor';" />
                     </div>
 
-                    <div class="card-footer d-flex justify-content-between">
+                    <div class="card-footer text-end">
                         <a asp-controller="Doctors"
                            asp-action="Details"
-                           asp-route-id="@doctor.IdDoctor"
+                           asp-route-id="@item.IdDoctor"
                            class="btn btn-outline-secondary btn-sm">
-                            Details
+                            Read more
                         </a>
 
                         <a asp-controller="Appointments"
                            asp-action="Create"
-                           asp-route-doctorId="@doctor.IdDoctor"
+                           asp-route-doctorId="@item.IdDoctor"
                            class="btn btn-primary btn-sm">
                             Register
                         </a>
@@ -77,10 +100,46 @@
         }
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">
-            No doctors found.
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            Page @currentPage / @totalPages
         </div>
-    }
+
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(currentPage - 1)"
+                       asp-route-pageSize="@pageSize"
+                       asp-route-search="@search">
+                        Previous
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-pageSize="@pageSize"
+                           asp-route-search="@search">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(currentPage + 1)"
+                       asp-route-pageSize="@pageSize"
+                       asp-route-search="@search">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>

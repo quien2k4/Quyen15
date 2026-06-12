@@ -56,6 +56,11 @@
                                     Hello, @Context.Session.GetString("FullName")
                                 </span>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Profile">
+                                    Profile
+                                </a>
+                            </li>
 
                             @if (role == "Patient")
                             {

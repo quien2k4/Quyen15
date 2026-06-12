@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Quyen15.Models;
 using Quyen15.Services;
-using System.Text;
 
 namespace Quyen15.Controllers
 {
@@ -65,7 +64,6 @@ namespace Quyen15.Controllers
             return View(appointment);
         }
 
-        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> Create(Appointment appointment, string paymentMethod)
         {
@@ -156,52 +154,56 @@ namespace Quyen15.Controllers
 
                 if (user != null)
                 {
+                    string appointmentDateText = appointment.AppointmentDate.ToString("dd/MM/yyyy");
+                    string appointmentTimeText = appointment.AppointmentTime.ToString(@"hh\:mm");
+                    string paymentAmountText = payment.Amount.ToString("N0");
+
                     string subject = "Appointment Confirmation - Quyen15 Medical";
 
                     string body = $@"
-            <h2>Appointment Confirmation</h2>
+                        <h2>Appointment Confirmation</h2>
 
-            <p>Hello <strong>{patient.Name}</strong>,</p>
+                        <p>Hello <strong>{patient.Name}</strong>,</p>
 
-            <p>Your medical appointment has been registered successfully.</p>
+                        <p>Your medical appointment has been registered successfully.</p>
 
-            <table border='1' cellpadding='8' cellspacing='0' style='border-collapse: collapse;'>
-                <tr>
-                    <td><strong>Patient</strong></td>
-                    <td>{patient.Name}</td>
-                </tr>
-                <tr>
-                    <td><strong>Phone</strong></td>
-                    <td>{patient.Phone}</td>
-                </tr>
-                <tr>
-                    <td><strong>Doctor</strong></td>
-                    <td>{doctor.Name}</td>
-                </tr>
-                <tr>
-                    <td><strong>Specialization</strong></td>
-                    <td>{doctor.Specialization}</td>
-                </tr>
-                <tr>
-                    <td><strong>Appointment Date</strong></td>
-                    <td>{appointment.AppointmentDate:dd/MM/yyyy}</td>
-                </tr>
-                <tr>
-                    <td><strong>Appointment Time</strong></td>
-                    <td>{appointment.AppointmentTime:hh\\:mm}</td>
-                </tr>
-                <tr>
-                    <td><strong>Status</strong></td>
-                    <td>{appointment.Status}</td>
-                </tr>
-                <tr>
-                    <td><strong>Payment</strong></td>
-                    <td>{payment.Amount:N0} VND - {payment.PaymentStatus}</td>
-                </tr>
-            </table>
+                        <table border='1' cellpadding='8' cellspacing='0' style='border-collapse: collapse;'>
+                            <tr>
+                                <td><strong>Patient</strong></td>
+                                <td>{patient.Name}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone</strong></td>
+                                <td>{patient.Phone}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Doctor</strong></td>
+                                <td>{doctor.Name}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Specialization</strong></td>
+                                <td>{doctor.Specialization}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Appointment Date</strong></td>
+                                <td>{appointmentDateText}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Appointment Time</strong></td>
+                                <td>{appointmentTimeText}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status</strong></td>
+                                <td>{appointment.Status}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Payment</strong></td>
+                                <td>{paymentAmountText} VND - {payment.PaymentStatus}</td>
+                            </tr>
+                        </table>
 
-            <p>Thank you for using Quyen15 Medical Examination Registration.</p>
-        ";
+                        <p>Thank you for using Quyen15 Medical Examination Registration.</p>
+                    ";
 
                     await _emailService.SendEmailAsync(user.Email, subject, body);
 
@@ -238,6 +240,7 @@ namespace Quyen15.Controllers
     .Include(a => a.Doctor)
     .Include(a => a.MedicalRecord)
     .Include(a => a.Payment)
+    .Include(a => a.TestResults)
     .Where(a => a.IdPatient == patient.IdPatient)
     .OrderByDescending(a => a.AppointmentDate)
     .ToListAsync();
@@ -311,12 +314,13 @@ namespace Quyen15.Controllers
             }
 
             var appointments = await _context.Appointments
-                .Include(a => a.Patient)
-                .Include(a => a.MedicalRecord)
-                .Where(a => a.IdDoctor == doctor.IdDoctor)
-                .OrderBy(a => a.AppointmentDate)
-                .ThenBy(a => a.AppointmentTime)
-                .ToListAsync();
+    .Include(a => a.Patient)
+    .Include(a => a.MedicalRecord)
+    .Include(a => a.TestResults)
+    .Where(a => a.IdDoctor == doctor.IdDoctor)
+    .OrderBy(a => a.AppointmentDate)
+    .ThenBy(a => a.AppointmentTime)
+    .ToListAsync();
 
             return View(appointments);
         }

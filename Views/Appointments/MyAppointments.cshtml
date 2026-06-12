@@ -38,6 +38,7 @@
                 <th>Status</th>
                 <th>Payment</th>
                 <th>Medical Record</th>
+                <th>Test Results</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -110,6 +111,27 @@
                     </td>
 
                     <td>
+                        @if (item.TestResults != null && item.TestResults.Any())
+                        {
+                            foreach (var test in item.TestResults)
+                            {
+                                <div class="mb-1">
+                                    <a asp-controller="TestResults"
+                                       asp-action="Details"
+                                       asp-route-id="@test.IdTestResult"
+                                       class="btn btn-outline-primary btn-sm">
+                                        @test.TestType
+                                    </a>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">No test result</span>
+                        }
+                    </td>
+
+                    <td>
                         @if (canCancel)
                         {
                             <a asp-action="Cancel"
@@ -124,6 +146,8 @@
                             <span class="text-muted">No action</span>
                         }
                     </td>
+
+
                 </tr>
             }
         </tbody>
