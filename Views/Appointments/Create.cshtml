@@ -1,0 +1,74 @@
+﻿@model Quyen15.Models.Appointment
+
+@{
+    ViewData["Title"] = "Register Appointment";
+
+    var doctor = ViewBag.Doctor as Quyen15.Models.Doctor;
+    var patient = ViewBag.Patient as Quyen15.Models.Patient;
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Register for Medical Examination</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Confirm Appointment Information
+                </div>
+
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All"></div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <strong>Patient:</strong> @patient?.Name
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Phone:</strong> @patient?.Phone
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Doctor:</strong> @doctor?.Name
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Specialization:</strong> @doctor?.Specialization
+                    </div>
+
+                    <hr />
+
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="IdDoctor" />
+                        <input type="hidden" asp-for="IdPatient" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Date</label>
+                            <input asp-for="AppointmentDate" type="date" class="form-control" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Time</label>
+                            <input asp-for="AppointmentTime" type="time" class="form-control" />
+                            <span asp-validation-for="AppointmentTime" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Confirm Register
+                        </button>
+
+                        <a asp-controller="Doctors" asp-action="Index" class="btn btn-secondary">
+                            Back
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@model IEnumerable<Quyen15.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Manager Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5>Doctors</h5>
+                    <h3>@ViewBag.TotalDoctors</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5>Patients</h5>
+                    <h3>@ViewBag.TotalPatients</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5>Total</h5>
+                    <h3>@ViewBag.TotalAppointments</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5>Pending</h5>
+                    <h3>@ViewBag.PendingAppointments</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5>Completed</h5>
+                    <h3>@ViewBag.CompletedAppointments</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5>Cancelled</h5>
+                    <h3>@ViewBag.CancelledAppointments</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a asp-controller="Manager" asp-action="Appointments" class="btn btn-primary">
+            View All Appointments
+        </a>
+
+        <a asp-controller="Manager" asp-action="Statistics" class="btn btn-success">
+            View Statistics
+        </a>
+    </div>
+
+    <h4>Recent Appointments</h4>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Patient?.Name</td>
+                    <td>@item.Doctor?.Name</td>
+                    <td>@item.Doctor?.Specialization</td>
+                    <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.AppointmentTime.ToString(@"hh\:mm")</td>
+                    <td>@item.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

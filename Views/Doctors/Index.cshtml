@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Quyen15.Models.Doctor>
+
+@{
+    ViewData["Title"] = "Home";
+    string sectionTitle = ViewBag.SectionTitle as string ?? "Popular Doctors";
+}
+
+<div class="p-5 mb-4 rounded-3 shadow-sm bg-primary text-white">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold">Medical Examination Registration</h1>
+
+        <p class="col-md-8 fs-5">
+            Find trusted doctors, register for medical appointments, view your medical history,
+            and manage examination records easily.
+        </p>
+
+        <a asp-controller="Doctors" asp-action="Index" class="btn btn-light btn-lg">
+            View Doctors
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <h3 class="mb-4">@sectionTitle</h3>
+
+    <div class="row">
+        @foreach (var doctor in Model)
+        {
+            double avgRating = doctor.DoctorReviews != null && doctor.DoctorReviews.Any()
+                ? doctor.DoctorReviews.Average(r => r.Rating)
+                : 0;
+
+            int likeCount = doctor.DoctorReviews != null
+                ? doctor.DoctorReviews.Count(r => r.IsLike)
+                : 0;
+
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@(string.IsNullOrEmpty(doctor.Image) ? "https://placehold.co/300x220?text=Doctor" : doctor.Image)"
+                         class="card-img-top"
+                         style="height:220px; object-fit:cover;"
+                         onerror="this.src='https://placehold.co/300x220?text=Doctor';" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@doctor.Name</h5>
+
+                        <p class="card-text mb-1">
+                            <strong>Specialization:</strong> @doctor.Specialization
+                        </p>
+
+                        <p class="card-text mb-1">
+                            <strong>Rating:</strong> @avgRating.ToString("0.0") / 5
+                        </p>
+
+                        <p class="card-text">
+                            <strong>Likes:</strong> @likeCount
+                        </p>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between">
+                        <a asp-controller="Doctors"
+                           asp-action="Details"
+                           asp-route-id="@doctor.IdDoctor"
+                           class="btn btn-outline-secondary btn-sm">
+                            Details
+                        </a>
+
+                        <a asp-controller="Appointments"
+                           asp-action="Create"
+                           asp-route-doctorId="@doctor.IdDoctor"
+                           class="btn btn-primary btn-sm">
+                            Register
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No doctors found.
+        </div>
+    }
+</div>

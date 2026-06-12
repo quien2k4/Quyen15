@@ -1,0 +1,34 @@
+﻿@model Quyen15.Models.MedicalRecord
+
+@{
+    ViewData["Title"] = "Medical Record";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Medical Record</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            Patient Information
+        </div>
+
+        <div class="card-body">
+            <p><strong>Patient:</strong> @Model.Patient?.Name</p>
+            <p><strong>Doctor:</strong> @Model.Doctor?.Name</p>
+            <p><strong>Appointment Date:</strong> @Model.Appointment?.AppointmentDate.ToString("dd/MM/yyyy")</p>
+            <p><strong>Record Date:</strong> @Model.RecordDate.ToString("dd/MM/yyyy HH:mm")</p>
+
+            <hr />
+
+            <h5>Medical Details</h5>
+
+            <p><strong>Diagnosis:</strong> @Model.Diagnosis</p>
+            <p><strong>Prescription:</strong> @Model.Prescription</p>
+            <p><strong>Notes:</strong> @Model.Notes</p>
+
+            <a asp-controller="Appointments" asp-action="MyAppointments" class="btn btn-secondary">
+                Back
+            </a>
+        </div>
+    </div>
+</div>

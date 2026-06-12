@@ -1,0 +1,71 @@
+﻿@model Quyen15.Models.MedicalRecord
+
+@{
+    ViewData["Title"] = "Create Medical Record";
+
+    var appointment = ViewBag.Appointment as Quyen15.Models.Appointment;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Create Medical Record</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            Patient Examination
+        </div>
+
+        <div class="card-body">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <div asp-validation-summary="All"></div>
+                </div>
+            }
+
+            <div class="mb-3">
+                <strong>Patient:</strong> @appointment?.Patient?.Name
+            </div>
+
+            <div class="mb-3">
+                <strong>Doctor:</strong> @appointment?.Doctor?.Name
+            </div>
+
+            <div class="mb-3">
+                <strong>Appointment Date:</strong> @appointment?.AppointmentDate.ToString("dd/MM/yyyy")
+            </div>
+
+            <hr />
+
+            <form asp-action="Create" method="post">
+                <input type="hidden" asp-for="IdAppointment" />
+                <input type="hidden" asp-for="IdPatient" />
+                <input type="hidden" asp-for="IdDoctor" />
+
+                <div class="mb-3">
+                    <label class="form-label">Diagnosis</label>
+                    <input asp-for="Diagnosis" class="form-control" />
+                    <span asp-validation-for="Diagnosis" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Prescription</label>
+                    <input asp-for="Prescription" class="form-control" />
+                    <span asp-validation-for="Prescription" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Save
+                </button>
+
+                <a asp-controller="Appointments" asp-action="DoctorAppointments" class="btn btn-secondary">
+                    Back
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@model Quyen15.Models.Doctor
+
+@{
+    ViewData["Title"] = "Doctor Detail";
+
+    double averageRating = ViewBag.AverageRating;
+    int likeCount = ViewBag.LikeCount;
+    int reviewCount = ViewBag.ReviewCount;
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">@Model.Name</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="@(string.IsNullOrEmpty(Model.Image) ? "https://placehold.co/300x300?text=Doctor" : Model.Image)"
+                         class="img-fluid rounded"
+                         style="width:100%; height:300px; object-fit:cover;"
+                         onerror="this.src='https://placehold.co/300x300?text=Doctor';" />
+                </div>
+
+                <div class="col-md-8">
+                    <p><strong>Specialization:</strong> @Model.Specialization</p>
+                    <p><strong>Phone:</strong> @Model.Phone</p>
+                    <p><strong>Email:</strong> @Model.Email</p>
+
+                    <p>
+                        <strong>Rating:</strong>
+                        @averageRating.ToString("0.0") / 5
+                        -
+                        <strong>Reviews:</strong> @reviewCount
+                        -
+                        <strong>Likes:</strong> @likeCount
+                    </p>
+
+                    <hr />
+
+                    <h5>Work Experience</h5>
+                    <p>@Model.WorkExperience</p>
+
+                    <div class="mt-3">
+                        <a asp-controller="Appointments"
+                           asp-action="Create"
+                           asp-route-doctorId="@Model.IdDoctor"
+                           class="btn btn-primary">
+                            Register for Examination
+                        </a>
+
+                        <a asp-controller="Doctors"
+                           asp-action="Index"
+                           class="btn btn-secondary">
+                            Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Comments and Reviews</h4>
+
+    @if (Model.DoctorReviews != null && Model.DoctorReviews.Any())
+    {
+        foreach (var review in Model.DoctorReviews)
+        {
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>
+                        @(review.Patient != null ? review.Patient.Name : "Patient")
+                    </h6>
+
+                    <p class="mb-1">
+                        <strong>Rating:</strong> @review.Rating / 5
+                        -
+                        <strong>Like:</strong> @(review.IsLike ? "Yes" : "No")
+                    </p>
+
+                    <p class="mb-0">@review.Comment</p>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">
+            No reviews yet.
+        </div>
+    }
+</div>

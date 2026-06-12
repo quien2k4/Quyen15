@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Quyen15.Models.DoctorStatisticViewModel>
+
+@{
+    ViewData["Title"] = "Appointment Statistics";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Appointment Statistics by Doctor</h2>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Total Appointments</th>
+                <th>Pending</th>
+                <th>Completed</th>
+                <th>Cancelled</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.DoctorName</td>
+                    <td>@item.Specialization</td>
+                    <td>@item.TotalAppointments</td>
+                    <td>@item.PendingAppointments</td>
+                    <td>@item.CompletedAppointments</td>
+                    <td>@item.CancelledAppointments</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-controller="Manager" asp-action="Dashboard" class="btn btn-secondary">
+        Back to Dashboard
+    </a>
+</div>

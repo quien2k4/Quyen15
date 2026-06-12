@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Quyen15.Models.Appointment>
+
+@{
+    ViewData["Title"] = "All Appointments";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">All Appointments</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Patient?.Name</td>
+                    <td>@item.Doctor?.Name</td>
+                    <td>@item.Doctor?.Specialization</td>
+                    <td>@item.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.AppointmentTime.ToString(@"hh\:mm")</td>
+                    <td>
+                        @if (item.Status == "Pending")
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                        else if (item.Status == "Confirmed")
+                        {
+                            <span class="badge bg-primary">Confirmed</span>
+                        }
+                        else if (item.Status == "Completed")
+                        {
+                            <span class="badge bg-success">Completed</span>
+                        }
+                        else if (item.Status == "Cancelled")
+                        {
+                            <span class="badge bg-danger">Cancelled</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@item.Status</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.Status == "Pending")
+                        {
+                            <a asp-controller="Manager"
+                               asp-action="ConfirmAppointment"
+                               asp-route-id="@item.IdAppointment"
+                               class="btn btn-primary btn-sm"
+                               onclick="return confirm('Confirm this appointment?');">
+                                Confirm
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No action</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-controller="Manager" asp-action="Dashboard" class="btn btn-secondary">
+        Back to Dashboard
+    </a>
+</div>
